@@ -1061,6 +1061,70 @@ class Solution {
     }
 }
 ```
+## 541 反转字符串Ⅱ
 
-123
+```java
+class Solution {    //2ms,14.82%
+    public String reverseStr(String s, int k) {
+        char[] res = s.toCharArray();
+        int num = 0;
+        if (res.length < k){    //未考虑点：如果本身长度小于k，则需要反转
+            reverseString(res, 0, res.length - 1);
+            return new String(res);
+        }
+        for (int i = 0; i < res.length; i++) {
+            num ++;
+            if (num % (2 * k) == 0) {
+                if (res.length - num < k){  //如果存在2k长度之后，剩下数组小于k，则反转剩余字符
+                    reverseString(res, num, res.length - 1);
+                    break;
+                }
+                continue;
+            }
+            if (num % k == 0) {
+                reverseString(res, num - k, num - 1);
+            }
+        }
+        return new String(res);
+    }
+    public void reverseString(char[] s, int left, int right) {
+        while (left < right) {
+            char temp = s[left];
+            s[left] = s[right];
+            s[right] = temp;
+            right --;
+            left ++;
+        }
+    }
+}
+```
+标答：直接区间跳转，不用一个个循环，加快速度
+```java
+class Solution {
+    public String reverseStr(String s, int k) {
+        char[] ch = s.toCharArray();
+        // 1. 每隔 2k 个字符的前 k 个字符进行反转
+        for (int i = 0; i< ch.length; i += 2 * k) {
+            // 2. 剩余字符小于 2k 但大于或等于 k 个，则反转前 k 个字符
+            if (i + k <= ch.length) {
+                reverse(ch, i, i + k -1);
+                continue;
+            }
+            // 3. 剩余字符少于 k 个，则将剩余字符全部反转
+            reverse(ch, i, ch.length - 1);
+        }
+        return  new String(ch);
+
+    }
+    // 定义翻转函数
+    public void reverse(char[] ch, int i, int j) {
+    for (; i < j; i++, j--) {
+        char temp  = ch[i];
+        ch[i] = ch[j];
+        ch[j] = temp;
+    }
+
+    }
+}
+```
 
