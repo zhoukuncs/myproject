@@ -1045,3 +1045,20 @@ class Solution {	//本题类似三数之和，多一重循环，5数6数就继�
 }
 ```
 
+## 344.反转字符串
+
+```java
+class Solution {
+    public void reverseString(char[] s) {
+        int left = 0, right = s.length - 1;
+        while (left < right) {
+            char temp = s[left];
+            s[left] = s[right];
+            s[right] = temp;
+            right --;
+            left ++;
+        }
+    }
+}
+```
+
