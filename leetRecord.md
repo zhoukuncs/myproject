@@ -1277,3 +1277,76 @@ class Solution {
 }
 ```
 
+## 剑指Offer58-II.左旋转字符串
+
+```java
+class Solution {
+    public String reverseLeftWords(String s, int n) {
+         return s.substring(n) + s.substring(0, n);
+    }
+}
+```
+
+高性能：不申请空间
+
+```java
+class Solution {
+    public String reverseLeftWords(String s, int n) {
+        int len=s.length();
+        StringBuilder sb=new StringBuilder(s);
+        reverseString(sb,0,n-1);
+        reverseString(sb,n,len-1);
+        return sb.reverse().toString();
+    }
+     public void reverseString(StringBuilder sb, int start, int end) {
+        while (start < end) {
+            char temp = sb.charAt(start);
+            sb.setCharAt(start, sb.charAt(end));
+            sb.setCharAt(end, temp);
+            start++;
+            end--;
+            }
+        }
+}
+```
+
+## 实现 `strStr()` 5
+
+```java
+class Solution {	//考点为KMP算法，否则没有意义
+    public int strStr(String haystack, String needle) {
+        if (needle == null || needle.equals("")) {
+            return 0;
+        }
+        int[] next = new int[needle.length()];
+        getNext(next, needle);
+        for (int i = 0, j = 0; i < haystack.length(); i ++) {
+            while (j > 0 && haystack.charAt(i) != needle.charAt(j)) {
+                j = next[j];
+            }    
+            if (haystack.charAt(i) == needle.charAt(j)) j ++;
+            if (j == needle.length()) {
+                return i - j + 1;
+            }
+        }
+        return -1;
+    }
+    public void getNext(int[] next, String s) {		//生成next数组
+        next[0] = 0;
+        for (int i = 1, j = 0; i < s.length(); i ++) {
+            while (s.charAt(i) != s.charAt(j) && j > 0) {
+                j = next[j - 1];
+            }
+            if (s.charAt(i) == s.charAt(j)) {
+                j++;
+            }
+            next[i] = j;	//主要问题在于next数组生成的问题导致一些案例出错
+        }
+        for (int i = next.length - 1; i > 0; i--) {	//整体右移一位，
+            next[i] = next[i - 1];
+        }
+        next[0] = 0;
+    }
+}
+```
+
