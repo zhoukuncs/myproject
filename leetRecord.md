@@ -1,6 +1,6 @@
 # 数组
 
-## 704 二分查找 1
+## 704 二分查找 3
 
 ```java
 class Solution {
@@ -226,7 +226,7 @@ class Solution {
 //138ms, 41,6M
 ```
 
-## 59 螺旋矩阵Ⅱ
+## 59 螺旋矩阵Ⅱ 9
 
 ```java
 class Solution {	//统一规则方法值得学习，每次画一条变都采用统一的规则，减少边界条件
@@ -720,7 +720,7 @@ public class Solution {	//消除差距，指针同步
 }
 ```
 
-## 142 环形链表
+## 142 环形链表 9
 
 ```java
 public class Solution {	//快慢指针法
@@ -1045,7 +1045,7 @@ class Solution {	//本题类似三数之和，多一重循环，5数6数就继�
 }
 ```
 
-## 344.反转字符串
+## 344.反转字符串 1
 
 ```java
 class Solution {
@@ -1061,7 +1061,7 @@ class Solution {
     }
 }
 ```
-## 541 反转字符串Ⅱ
+## 541 反转字符串Ⅱ 1
 
 ```java
 class Solution {    //2ms,14.82%
@@ -1127,7 +1127,7 @@ class Solution {
     }
 }
 ```
-## 剑指Offer 05. 替换空格
+## 剑指Offer 05. 替换空格 1
 ```java
 class Solution {
     public String replaceSpace(String s) {
@@ -1277,7 +1277,7 @@ class Solution {
 }
 ```
 
-## 剑指Offer58-II.左旋转字符串
+## 剑指Offer58-II.左旋转字符串 1
 
 ```java
 class Solution {
@@ -1335,17 +1335,291 @@ class Solution {	//考点为KMP算法，否则没有意义
         next[0] = 0;
         for (int i = 1, j = 0; i < s.length(); i ++) {
             while (s.charAt(i) != s.charAt(j) && j > 0) {
-                j = next[j - 1];
+                j = next[j - 1];	// 因为这一个不相等，所以去查找前一个字符的最长匹配后缀，因为这个最前匹配与i这一个之前的相等，所以跳到这个最长匹配的之后开始比较，这里很关键。
             }
             if (s.charAt(i) == s.charAt(j)) {
                 j++;
             }
             next[i] = j;	//主要问题在于next数组生成的问题导致一些案例出错
         }
-        for (int i = next.length - 1; i > 0; i--) {	//整体右移一位，
+        for (int i = next.length - 1; i > 0; i--) {	//整体右移一位，这样的话第十行j = next[j]就不用为next[j-1]
             next[i] = next[i - 1];
         }
         next[0] = 0;
+    }
+}
+```
+
+## 459.重复的子字符串 2
+
+```java
+class Solution {
+    public boolean repeatedSubstringPattern(String s) {
+        int[] next = new int[s.length()];
+        getNext(next, s);
+        if (next[s.length() - 1] > 0 && s.length() % (s.length() - next[s.length() - 1]) == 0) { //如果存在能够满足的字符串，那么最末尾的最长匹配后缀一定是最大的，且减去这个值后，就是那个重复的子字符串的长度，且字符串长度能够被这个长度整除
+            return true;
+        }
+        return false;
+    }
+    private void getNext(int[] next, String s) {	//求解next数组，存储的就是当前字符串的最大匹配，不用向像一个题目那样右移。
+        next[0] = 0;
+        for (int i = 1, j = 0; i < s.length(); i++) {
+            while (j > 0 && s.charAt(i) != s.charAt(j)) {
+                j = next[j - 1];	//构造关键还是在于这里
+            }
+            if (s.charAt(i) == s.charAt(j)) {
+                j ++;
+            }
+            next[i] = j;
+        }
+    }
+}
+```
+
+`KMP`的主要思想是**当出现字符串不匹配时，可以知道一部分之前已经匹配的文本内容，可以利用这些信息避免从头再去做匹配了**
+
+## 232.用栈实现队列 1
+
+```java
+class MyQueue {
+    Stack<Integer> s1, s2;
+    public MyQueue() {
+        s1 = new Stack<Integer>();
+        s2 = new Stack<Integer>();
+    }
+
+    public void push(int x) {
+        s1.push(x);
+    }
+
+    public int pop() {
+        while (!s1.empty()) {
+            s2.push(s1.pop());
+        }
+        int temp =  s2.pop();
+        while (!s2.empty()) {
+            s1.push(s2.pop());
+        }
+        return temp;
+    }
+ //  可以被必要全部又倒到第一个栈，增加一个判断， 因为此时第二个栈是队头。
+//    public int pop() {
+//        if (!s2.empty()) {
+//            return s2.pop();
+//        }
+ //       while (!s1.empty()) {
+ //           s2.push(s1.pop());
+ //       }
+ //       return s2.pop();
+//    }
+    public int peek() {
+        while (!s1.empty()) {
+            s2.push(s1.pop());
+        }
+        int temp =  s2.peek();
+        while (!s2.empty()) {
+            s1.push(s2.pop());
+        }
+        return temp;        
+    }
+    
+    public boolean empty() {
+        return s1.empty();
+    }
+}
+
+/**
+ * Your MyQueue object will be instantiated and called as such:
+ * MyQueue obj = new MyQueue();
+ * obj.push(x);
+ * int param_2 = obj.pop();
+ * int param_3 = obj.peek();
+ * boolean param_4 = obj.empty();
+ */
+```
+
+## 225. 用队列实现栈 1
+
+```java
+class MyStack {	//双端队列
+    Deque<Integer> q;  
+    public MyStack() {
+        q = new LinkedList<Integer>();
+    }
+    
+    public void push(int x) {
+        q.offerLast(x);
+    }
+
+    public int pop() {
+        return q.pollLast();
+    }
+    
+    public int top() {
+        return q.peekLast();
+    }
+    
+    public boolean empty() {
+        return q.size() == 0;
+    }
+
+}
+```
+
+队列函数参考：https://blog.csdn.net/devnn/article/details/82716447
+
+## 20. 有效的括号 2
+
+```java
+class Solution {	//使用双端队列用作栈
+    public boolean isValid(String s) {
+        Deque<Character> dq = new LinkedList<Character>();
+        for (char c : s.toCharArray()) {
+            if (dq.size() == 0) {
+                dq.offerLast(c);
+                continue;
+            }
+            switch (dq.peekLast()) {
+                case '(' : 
+                    if (c == ')')    dq.pollLast();
+                    else    dq.offerLast(c);	//这里每次都进行判断，不能放入default中，否则会忽略添加
+                    break;
+                case '{' : 
+                    if (c == '}')   dq.pollLast();
+                    else dq.offerLast(c);
+                    break;                
+                case '[' : 
+                    if (c == ']')   dq.pollLast();
+                    else dq.offerLast(c);
+                    break;
+            }
+        }
+        return dq.size() == 0;
+    }
+}
+```
+
+标答:
+
+```java
+class Solution {	//用了骚操作，减少循环，但是提交后并没有快多少
+    public boolean isValid(String s) {
+        Deque<Character> deque = new LinkedList<>();
+        char ch;
+        for (int i = 0; i < s.length(); i++) {
+            ch = s.charAt(i);
+            //碰到左括号，就把相应的右括号入栈
+            if (ch == '(') {
+                deque.push(')');
+            }else if (ch == '{') {
+                deque.push('}');
+            }else if (ch == '[') {
+                deque.push(']');
+            } else if (deque.isEmpty() || deque.peek() != ch) {
+                return false;
+            }else {//如果是右括号判断是否和栈顶元素匹配
+                deque.pop();
+            }
+        }
+        //最后判断栈中元素是否匹配
+        return deque.isEmpty();
+    }
+}
+
+```
+
+## 1047. 删除字符串中的所有相邻重复项 1
+
+```java
+class Solution {
+    public String removeDuplicates(String s) {
+        Deque<Character> q = new LinkedList<Character>();
+        for (char c: s.toCharArray()) {
+            if (q.isEmpty()){
+                q.offerLast(c);
+                continue;
+            }    
+            if (q.peekLast() == c){
+                q.pollLast();
+            } else {
+                q.offerLast(c);
+            }
+        }
+        StringBuffer res = new StringBuffer();
+        while(!q.isEmpty()) {
+            res.append(q.pollFirst());
+        }
+        return res.toString();
+    }
+}
+```
+
+## 150. 逆波兰表达式求值 1
+
+```java
+class Solution {	//用栈的经典题
+    public int evalRPN(String[] tokens) {
+        Deque<String> q = new LinkedList<String>();
+        for (String s : tokens) {
+            if (q.isEmpty()) {
+                q.offerLast(s);
+                continue;
+            }
+            if (s.equals("+") || s.equals("-") || s.equals("*") || s.equals("/")) {	//用==出错，在于leetcode测试java版本较老
+                int temp2 = Integer.parseInt(q.pollLast()); 
+                int temp1 = Integer.parseInt(q.pollLast()); 
+                int sum = 0;              
+                switch (s) {
+                    case "+" :{
+                        sum = temp1 + temp2;
+                    }
+                    break;
+                    case "-" :{
+                        sum = temp1 - temp2;
+                    }
+                    break;
+                    case "*" :{
+                        sum = temp1 * temp2;
+                    }
+                    break;
+                    case "/" :{
+                        sum = temp1 / temp2;
+                    }
+                    break;                                        
+                }
+                q.offerLast(String.valueOf(sum));
+                continue;
+            }
+            q.offerLast(s);
+        }
+        return Integer.parseInt(q.pollLast());
+    }
+}
+```
+
+标答：
+
+```java
+class Solution {
+    public int evalRPN(String[] tokens) {
+        Deque<Integer> stack = new LinkedList();
+        for (int i = 0; i < tokens.length; ++i) {
+            if ("+".equals(tokens[i])) {        // leetcode 内置jdk的问题，不能使用==判断字符串是否相等
+                stack.push(stack.pop() + stack.pop());      // 注意 - 和/ 需要特殊处理
+            } else if ("-".equals(tokens[i])) {
+                stack.push(-stack.pop() + stack.pop());
+            } else if ("*".equals(tokens[i])) {
+                stack.push(stack.pop() * stack.pop());
+            } else if ("/".equals(tokens[i])) {
+                int temp1 = stack.pop();
+                int temp2 = stack.pop();
+                stack.push(temp2 / temp1);
+            } else {
+                stack.push(Integer.valueOf(tokens[i]));	//直接再这里判断并加入，不用多次判断，栈里总是整数
+            }
+        }
+        return stack.pop();
     }
 }
 ```
