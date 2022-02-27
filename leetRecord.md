@@ -1624,3 +1624,277 @@ class Solution {
 }
 ```
 
+## 239. 滑动窗口最大值  7 （困难）
+
+```java
+class Solution {	//双端队列用作单调队列，队列总是维护窗口中尽可能大的值。
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        Deque<Integer> q = new LinkedList<Integer>();
+        q.offerLast(Integer.valueOf(-Integer.MAX_VALUE));
+        int[] res = new int[nums.length - k + 1];
+        int j = 0, i = 0;
+        for (int a : nums) {
+            i++;
+            if (i > k && nums[i - k - 1] == q.peekFirst()) {	
+                q.pollFirst();		//如果滑出的值等于队列中的最大值，则去掉该值。
+            }            
+            while (!q.isEmpty() && a > q.peekLast()) {	//虽然是双端队列，但是排序时，从右往左添加，不要两遍添加，可能出现不可预知的错误，再测试用例过多时，找不出bug！最后换成这种单边排序，不会出现问题。去掉队列右边的小值，存储大于或等于的值，注意必须也得存储等于的值！
+                q.pollLast();
+            }
+            q.offerLast(a);		//这里会加上等于的值，否则出现丢失最大值，因为可能在下一次循环丢掉该值（之前进来的这个数刚好等于滑出的那个值的情况）
+            if (i >= k) {
+                res[j++] = q.peekFirst();
+            }
+        }
+        return res;
+    }
+}
+```
+
+## 347.前 K 个高频元素 6
+
+```java
+class Solution {	//先用map存储出现次数，再用优先队列实现大根堆，只保留k个数。
+    public int[] topKFrequent(int[] nums, int k) {
+        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+        for (int a : nums) {
+            if (map.containsKey(a)) {
+                map.put(a, map.get(a) + 1);
+            } else {
+                map.put(a, 1);
+            }
+        }
+        Comparator<Map.Entry<Integer, Integer>> comparator = new Comparator<Map.Entry<Integer, Integer>>() {
+            // @override
+            public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+                return o1.getValue() - o2.getValue();   //优先队列默认小根堆，所以是o1在前，如果o2在前则编程大根堆
+            }
+        };
+        PriorityQueue<Map.Entry<Integer, Integer>> pq = new PriorityQueue<Map.Entry<Integer, Integer>>(comparator);
+        for (Map.Entry<Integer, Integer> temp : map.entrySet()) {
+            pq.offer(temp);
+        }
+        for (int i = 0; i < map.size() - k; i++) {   //这里不能为pq.size，因为这个在不断变化
+            pq.poll();
+        }
+        Iterator<Map.Entry<Integer, Integer>> it = pq.iterator();
+        int[] res = new int[pq.size()];
+        int i = 0;
+        while (it.hasNext()){
+            Map.Entry<Integer, Integer> temp = it.next();
+            res[i++] = temp.getKey();       //注意是获取键，也就是数组的元素
+        }
+        return res;
+    }
+}
+```
+
+标答：
+
+```java
+class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        int[] result = new int[k];
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int num : nums) {
+            map.put(num, map.getOrDefault(num, 0) + 1);
+        }
+
+        Set<Map.Entry<Integer, Integer>> entries = map.entrySet();
+        // 根据map的value值正序排，相当于一个小顶堆
+        PriorityQueue<Map.Entry<Integer, Integer>> queue = new PriorityQueue<>((o1, o2) -> o1.getValue() - o2.getValue());
+        for (Map.Entry<Integer, Integer> entry : entries) {
+            queue.offer(entry);
+            if (queue.size() > k) {
+                queue.poll();
+            }
+        }
+        for (int i = k - 1; i >= 0; i--) {
+            result[i] = queue.poll().getKey();
+        }
+        return result;
+    }
+}
+```
+
+# 二叉树
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+```
+
+
+
+## 102.二叉树的层序遍历 2
+
+```java
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        Queue<TreeNode> q = new LinkedList<TreeNode>();
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        if (root == null)   return res;
+        q.offer(root);
+        while(!q.isEmpty()) {
+            int len = q.size();
+            List<Integer> temp = new ArrayList<Integer>();
+            while(len > 0) {
+                TreeNode qn = q.poll();
+                temp.add(qn.val);
+                if (qn.left != null)    q.offer(qn.left);	//注意offer可以插入null值，且会增加队列的size，所以最好进行判断。
+                if (qn.right != null)   q.offer(qn.right);
+                len --;
+            }
+            res.add(temp);
+        }
+        return res;
+    }
+}
+```
+
+## 226.翻转二叉树 1
+
+```java
+class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        invertTree(root.left);
+        invertTree(root.right);
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        return root;
+    }
+}
+```
+
+## 101. 对称二叉树 1
+
+```java
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        TreeNode head = new TreeNode();
+        reverseTree(root, head);
+        return isEqual(root, head);
+    }
+
+    private boolean isEqual(TreeNode t1, TreeNode t2) {	//递归判断两颗二叉树是否相等
+        if (t1 ==null && t2 ==null) return true;
+        if (t1 == null || t2 == null) {
+            return false;
+        }
+        if (t1.val == t2.val) {                
+            return isEqual(t1.left, t2.left) && isEqual(t1.right, t2.right);
+        }else {
+            return false;
+        }
+    }
+
+    private void reverseTree(TreeNode root, TreeNode root2) {	//递归构造翻转二叉树，非空则创造节点，传递到下一层进行赋值
+        root2.val = root.val;
+        if (root.right != null){
+            TreeNode node1 = new TreeNode();
+            root2.left = node1;
+            reverseTree(root.right, node1);
+        } else {
+            root2.left = null;
+        }
+        if (root.left != null){
+            TreeNode node2 = new TreeNode();
+            root2.right = node2;
+            reverseTree(root.left, node2);
+        } else {
+            root2.right = null;
+        }
+    }
+}
+```
+
+标答：其实没必要构造一个翻转二叉树，可以直接递归进行比较
+
+```java
+class Solution{
+    public boolean isSymmetric(TreeNode root) {
+        return compare(root.left, root.right);
+    }
+    private boolean compare(TreeNode left, TreeNode right) {
+        if (left == null && right == null) {
+            return true;
+        }      
+        if (left == null || right == null) {
+            return false;
+        }
+        if (left.val != right.val) {
+            return false;
+        }
+        return compare(left.left, right.right) && compare(left.right, right.left);
+    }
+}
+```
+
+## 104.二叉树的最大深度 1
+
+```java
+class Solution {
+    public int maxDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int lenL = 0, lenR = 0;
+        if (root.left != null) { 		//可以继续精简，因为初始进行了判断
+            lenL = maxDepth(root.left);
+        }
+        if (root.right != null) {
+            lenR = maxDepth(root.right);
+        }
+        return (lenL > lenR ? lenL :lenR) + 1;
+    }
+}
+//	精简如下：
+class Solution {
+    public int maxDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+    }
+}
+```
+
+## 111.二叉树的最小深度 3
+
+```java
+class Solution {
+    public int minDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        if (root.left == null && root.right == null) {	
+            return 1;
+        }
+        if (root.left != null && root.right != null) {	//两棵树都不空，则从下层找
+            return Math.min(minDepth(root.left), minDepth(root.right)) + 1;
+        }
+        if (root.left != null) {
+            return minDepth(root.left) + 1;	//到这里说明存在有一个枝树不存在叶子节点，从有叶子节点的那一侧找
+        }
+        return minDepth(root.right) + 1;
+    }
+}
+```
+
