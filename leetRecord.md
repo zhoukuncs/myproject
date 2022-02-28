@@ -1898,3 +1898,32 @@ class Solution {
 }
 ```
 
+## 110.平衡二叉树 1
+
+```java
+class Solution {
+    boolean flag = true;
+    public boolean isBalanced(TreeNode root) {
+        if (root == null) {
+            return flag;
+        }
+        treeHigh(root);
+        return flag;
+    }
+
+    private int treeHigh(TreeNode root) {
+        if (root == null) return 0;
+        int treeL = treeHigh(root.left);
+        int treeR = treeHigh(root.right);
+        if (flag){
+            if (Math.abs(treeL - treeR) <= 1){
+                flag = true;
+            } else {
+                flag = false;
+            }
+        }
+        return Math.max(treeL, treeR) + 1;
+    }
+}
+```
+
