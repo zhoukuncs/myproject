@@ -3,7 +3,7 @@ package com.zk.learn;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;;
+import java.util.*;
 
 public class LeetTest {
     @Test
@@ -15,6 +15,7 @@ public class LeetTest {
         Queue<Integer> q = new LinkedList();
         q.offer(null);
         q.offer(null);
+        List<? extends List<Integer>> lists = new ArrayList<ArrayList<Integer>>();
     }
 }
 
